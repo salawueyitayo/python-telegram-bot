@@ -1,0 +1,29 @@
+from telegram import Update
+from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
+import pyautogui
+import os
+
+BOT_TOKEN = '7527589175:AAFchejA5EGBBB9ujbH0s-8t20RBUMU3seg'
+
+# Command handler
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text('Welcome! Send me a DXF file to process.')
+
+# File receiver handler
+async def handle_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    file = await update.message.document.get_file()
+    file_path = f"./downloads/{update.message.document.file_name}"
+    await file.download_to_drive(file_path)
+    
+    await update.message.reply_text(f"File {file_path} received. Processing...")
+    
+    # Here you can open CypNest and load the file, or move it to a watch folder
+    # Example using pyautogui to open CypNest or send keyboard shortcuts if needed
+
+# Main app
+app = ApplicationBuilder().token(BOT_TOKEN).build()
+app.add_handler(CommandHandler("start", start))
+app.add_handler(MessageHandler(filters.Document.ALL, handle_file))
+
+print("Bot is running...")
+app.run_polling()
